@@ -1,0 +1,28 @@
+{
+  "restaurant": {
+    "name": "Ember & Salt",
+    "address": "147 West 57th Street, New York, NY 10019",
+    "phone": "+1 (212) 555-0147",
+    "email": "reservations@emberandsalt.com",
+    "hours": "Tuesday–Sunday: 6:00 PM – 11:00 PM. Closed Mondays."
+  },
+  "menu": {
+    "starters": [
+      { "name": "Oyster & Ember Foam", "description": "Kumamoto oyster, smoked cream, charred leek oil, golden caviar.", "price": 34, "allergens": ["shellfish", "dairy"] },
+      { "name": "Garden Veil", "description": "Burrata, heirloom tomatoes, basil oil pearls, aged balsamic dust.", "price": 28, "allergens": ["dairy"], "vegetarian": true }
+    ],
+    "mains": [
+      { "name": "Salt-Crust Lamb", "description": "48-hour lamb rack, herb salt crust, smoked jus, ember-roasted root.", "price": 89, "allergens": ["gluten"] },
+      { "name": "Dry-Aged Halibut", "description": "Line-caught, 5-day dry-aged, saffron beurre blanc, micro herbs.", "price": 74, "allergens": ["fish", "dairy"] },
+      { "name": "A5 Wagyu Coal", "description": "Japanese A5 sirloin, coal-fired, black truffle butter, fleur de sel.", "price": 145, "allergens": ["dairy"] }
+    ],
+    "desserts": [
+      { "name": "Dark Caramel Orb", "description": "72% Valrhona sphere, salted caramel, smoked hazelnut, edible gold.", "price": 24, "allergens": ["dairy", "nuts"], "vegetarian": true }
+    ]
+  },
+  "booking_info": {
+    "available_times": ["6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM"],
+    "max_party_size": 12,
+    "private_dining_min": 8
+  }
+}
