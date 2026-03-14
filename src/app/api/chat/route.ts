@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.GROQ_API_KEY) {
       return NextResponse.json({ reply: "API key not configured." }, { status: 500 });
     }
 
@@ -30,41 +30,48 @@ Desserts: Dark Caramel Orb $24
 Booking times: 6:00PM, 6:30PM, 7:00PM, 7:30PM, 8:00PM, 8:30PM, 9:00PM
 `;
 
-    const prompt = `You are a helpful AI Host for Ember & Salt restaurant.
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful AI Host for Ember & Salt restaurant.
 Use this info to answer: ${menuContext}
 
 Rules:
 - Keep answers short (2-3 sentences)
-- If asked to book, collect: Name, Date, Time, Party Size one by one
+- If asked to book, collect Name, Date, Time, Party Size one by one
 - Once you have all 4 details, reply with EXACTLY this format:
   BOOKING_CONFIRMED: name=[Name] date=[Date] time=[Time] guests=[Guests]
 - Only answer restaurant related questions
-- Be warm and professional
-
-Customer says: ${message}`;
-
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 200, temperature: 0.7 },
-        }),
-      }
-    );
+- Be warm and professional`,
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+        max_tokens: 200,
+        temperature: 0.7,
+      }),
+    });
 
     if (!res.ok) {
       const err = await res.text();
-      console.error("Gemini error:", err);
-      return NextResponse.json({ reply: "Gemini API error. Check your API key." });
+      console.error("Groq error:", err);
+      return NextResponse.json({ reply: "AI error. Please try again." });
     }
 
     const data = await res.json();
-    let reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Sorry, I couldn't process that.";
+    let reply = data.choices?.[0]?.message?.content?.trim() || "Sorry, I couldn't process that.";
 
-    // Detect booking confirmation from Gemini
+    // Detect booking confirmation
     if (reply.includes("BOOKING_CONFIRMED:")) {
       const nameMatch = reply.match(/name=\[([^\]]+)\]/);
       const dateMatch = reply.match(/date=\[([^\]]+)\]/);
@@ -97,7 +104,7 @@ Customer says: ${message}`;
         `,
       });
 
-      reply = `Your table is confirmed! We look forward to welcoming ${name} on ${date} at ${time} for ${guests}. See you soon! 🍽️`;
+      reply = `Your table is confirmed! We look forward to welcoming ${name} on ${date} at ${time} for ${guests} guests. See you soon! 🍽️`;
     }
 
     return NextResponse.json({ reply });
