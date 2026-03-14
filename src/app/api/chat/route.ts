@@ -11,7 +11,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json();
+    const { message, history } = await req.json();
 
     if (!process.env.GROQ_API_KEY) {
       return NextResponse.json({ reply: "API key not configured." }, { status: 500 });
@@ -30,6 +30,11 @@ Desserts: Dark Caramel Orb $24
 Booking times: 6:00PM, 6:30PM, 7:00PM, 7:30PM, 8:00PM, 8:30PM, 9:00PM
 `;
 
+    const conversationMessages = (history || []).map((m: { role: string; text: string }) => ({
+      role: m.role === "user" ? "user" : "assistant",
+      content: m.text,
+    }));
+
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -45,13 +50,16 @@ Booking times: 6:00PM, 6:30PM, 7:00PM, 7:30PM, 8:00PM, 8:30PM, 9:00PM
 Use this info to answer: ${menuContext}
 
 Rules:
-- Keep answers short (2-3 sentences)
-- If asked to book, collect Name, Date, Time, Party Size one by one
-- Once you have all 4 details, reply with EXACTLY this format:
-  BOOKING_CONFIRMED: name=[Name] date=[Date] time=[Time] guests=[Guests]
+- Keep answers short (2-3 sentences max)
+- For bookings, collect Name, Date, Time, Party Size one by one
+- Once you have ALL 4 details confirmed, reply with EXACTLY this format on its own line:
+  BOOKING_CONFIRMED: name=[ActualName] date=[ActualDate] time=[ActualTime] guests=[ActualNumber]
+- Example: BOOKING_CONFIRMED: name=[John] date=[March 20th] time=[7 PM] guests=[2]
+- Always use square brackets around each value, no exceptions
 - Only answer restaurant related questions
 - Be warm and professional`,
           },
+          ...conversationMessages,
           {
             role: "user",
             content: message,

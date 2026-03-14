@@ -69,14 +69,15 @@ export default function VoiceWidget() {
 
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
-    setMessages(prev => [...prev, { role: "user", text }]);
+    const newMessages = [...messages, { role: "user" as const, text }];
+    setMessages(newMessages);
     setInputText("");
     setLoading(true);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, history: messages }),
       });
       const data = await res.json();
       const aiReply = data.reply || "Sorry, I couldn't process that.";
@@ -120,7 +121,6 @@ export default function VoiceWidget() {
       const current = final || interim;
       setTranscript(current);
       transcriptRef.current = current;
-      // Also show in text input
       setInputText(current);
     };
     recognition.onspeechend = () => recognition.stop();
@@ -157,7 +157,6 @@ export default function VoiceWidget() {
   return (
     <div style={{ position: "fixed", bottom: "2rem", right: "2rem", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem" }}>
 
-      {/* Chat window */}
       {open && (
         <div style={{ width: 360, height: 500, background: "rgba(10,7,5,0.98)", border: "1px solid rgba(201,169,110,0.2)", backdropFilter: "blur(16px)", borderRadius: 4, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
 
@@ -191,7 +190,6 @@ export default function VoiceWidget() {
               </div>
             ))}
 
-            {/* Loading dots */}
             {loading && (
               <div style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}>
                 <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(201,169,110,0.15)", border: "1px solid rgba(201,169,110,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem" }}>🤖</div>
@@ -203,7 +201,6 @@ export default function VoiceWidget() {
               </div>
             )}
 
-            {/* Live transcript preview */}
             {transcript && (
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <div style={{ maxWidth: "75%", padding: "0.65rem 1rem", fontSize: "0.82rem", color: "#7a6e62", border: "1px dashed rgba(201,169,110,0.2)", borderRadius: "12px 12px 2px 12px" }}>
@@ -214,7 +211,6 @@ export default function VoiceWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Waveform */}
           {listening && (
             <div style={{ padding: "0.4rem 1.2rem", borderTop: "1px solid rgba(201,169,110,0.08)", display: "flex", alignItems: "center", gap: "3px", justifyContent: "center" }}>
               {[0.3,0.6,1,0.7,0.4,0.8,0.5,1,0.6,0.3].map((h, i) => (
@@ -233,7 +229,6 @@ export default function VoiceWidget() {
               placeholder="Type a message..."
               style={s.input}
             />
-            {/* Mic button */}
             <button
               onClick={listening ? stopListening : startListening}
               title={listening ? "Stop" : "Speak"}
@@ -241,7 +236,6 @@ export default function VoiceWidget() {
             >
               {listening ? "⏹️" : "🎤"}
             </button>
-            {/* Send button */}
             <button
               onClick={() => sendMessage(inputText)}
               disabled={!inputText.trim() || loading}
@@ -255,7 +249,6 @@ export default function VoiceWidget() {
         </div>
       )}
 
-      {/* Toggle button */}
       <button
         onClick={() => setOpen(!open)}
         style={{ width: 60, height: 60, borderRadius: "50%", background: open ? "rgba(201,169,110,0.2)" : "rgba(10,7,5,0.95)", border: `2px solid ${open ? "#c9a96e" : "rgba(201,169,110,0.4)"}`, cursor: "pointer", fontSize: "1.4rem", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 24px rgba(0,0,0,0.5)", transition: "all 0.3s" }}
