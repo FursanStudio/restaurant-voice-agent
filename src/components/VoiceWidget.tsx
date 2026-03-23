@@ -47,6 +47,24 @@ export default function VoiceWidget() {
   const transcriptRef = useRef("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+
+  // Load consistent voice once
+  useEffect(() => {
+    const loadVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        v.name.includes("Google UK English Female") ||
+        v.name.includes("Samantha") ||
+        v.name.includes("Google US English") ||
+        v.name.includes("Google") ||
+        v.name.includes("Natural")
+      );
+      if (preferred) voiceRef.current = preferred;
+    };
+    loadVoice();
+    window.speechSynthesis.onvoiceschanged = loadVoice;
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,13 +73,10 @@ export default function VoiceWidget() {
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Samantha")
-    );
-    if (preferred) utterance.voice = preferred;
+    if (voiceRef.current) utterance.voice = voiceRef.current;
     utterance.rate = 0.95;
     utterance.pitch = 1;
+    utterance.volume = 1;
     utterance.onstart = () => setSpeaking(true);
     utterance.onend = () => setSpeaking(false);
     window.speechSynthesis.speak(utterance);
@@ -211,6 +226,7 @@ export default function VoiceWidget() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Waveform */}
           {listening && (
             <div style={{ padding: "0.4rem 1.2rem", borderTop: "1px solid rgba(201,169,110,0.08)", display: "flex", alignItems: "center", gap: "3px", justifyContent: "center" }}>
               {[0.3,0.6,1,0.7,0.4,0.8,0.5,1,0.6,0.3].map((h, i) => (
@@ -251,8 +267,8 @@ export default function VoiceWidget() {
 
       <button
         onClick={() => setOpen(!open)}
-        style={{ width: 60, height: 60, borderRadius: "50%", background: open ? "rgba(201,169,110,0.2)" : "rgba(10,7,5,0.95)", border: `2px solid ${open ? "#c9a96e" : "rgba(201,169,110,0.4)"}`, cursor: "pointer", fontSize: "1.4rem", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 24px rgba(0,0,0,0.5)", transition: "all 0.3s" }}
         title="Chat with AI Host"
+        style={{ width: 60, height: 60, borderRadius: "50%", background: open ? "rgba(201,169,110,0.2)" : "rgba(10,7,5,0.95)", border: `2px solid ${open ? "#c9a96e" : "rgba(201,169,110,0.4)"}`, cursor: "pointer", fontSize: "1.4rem", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 24px rgba(0,0,0,0.5)", transition: "all 0.3s" }}
       >
         {open ? "✕" : "🎤"}
       </button>

@@ -1,3 +1,6 @@
+"use client";
+import { useEffect } from "react";
+
 export default function VoiceTeaser() {
   const features = [
     { icon: "📋", title: "Menu Help", desc: "Ask about any dish or allergens" },
@@ -5,6 +8,18 @@ export default function VoiceTeaser() {
     { icon: "🌙", title: "24 / 7", desc: "Always available after hours" },
     { icon: "⚡", title: "Instant", desc: "No waiting. Just answers." },
   ];
+
+  const openWidget = () => {
+    // Find the toggle button in VoiceWidget and click it
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach((btn) => {
+      if (btn.title === "Chat with AI Host") {
+        btn.click();
+        // Scroll to bottom right so widget is visible
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      }
+    });
+  };
 
   return (
     <section id="voice" style={{ padding: "7rem 4rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
@@ -18,17 +33,37 @@ export default function VoiceTeaser() {
         Ask about our menu, make reservations, or get recommendations — all with your voice or by typing.
       </p>
 
-      {/* Orb with ripples */}
-      <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "4rem 0 1rem" }}>
+      {/* Clickable Orb */}
+      <div
+        onClick={openWidget}
+        style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "4rem 0 1rem", cursor: "pointer" }}
+      >
         {[160, 210, 265].map((size, i) => (
           <div key={size} style={{
             position: "absolute", borderRadius: "50%",
             border: "1px solid rgba(201,169,110,0.2)",
             width: size, height: size,
             animation: `ripple 3s ease-out ${i * 0.8}s infinite`,
+            pointerEvents: "none",
           }} />
         ))}
-        <div style={{ position: "relative", zIndex: 1, width: 120, height: 120, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem", border: "1px solid rgba(201,169,110,0.2)", background: "radial-gradient(circle at 40% 35%, rgba(201,169,110,0.2), transparent 70%)", cursor: "pointer" }}>
+        <div style={{
+          position: "relative", zIndex: 1, width: 120, height: 120, borderRadius: "50%",
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem",
+          border: "1px solid rgba(201,169,110,0.3)",
+          background: "radial-gradient(circle at 40% 35%, rgba(201,169,110,0.25), transparent 70%)",
+          transition: "all 0.3s",
+          boxShadow: "0 0 30px rgba(201,169,110,0.15)",
+        }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 50px rgba(201,169,110,0.4)";
+            (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 30px rgba(201,169,110,0.15)";
+            (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+          }}
+        >
           🎤
         </div>
       </div>
@@ -37,7 +72,7 @@ export default function VoiceTeaser() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", marginBottom: "4rem" }}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
         <p style={{ color: "#4ade80", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", margin: 0 }}>
-          Live — Click the 🎤 button at the bottom right!
+          Live — Click the mic to chat!
         </p>
       </div>
 
