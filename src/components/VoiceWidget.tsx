@@ -49,17 +49,19 @@ export default function VoiceWidget() {
   const inputRef = useRef<HTMLInputElement>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
-  // Load consistent voice once
+  // Load best available voice once
   useEffect(() => {
     const loadVoice = () => {
       const voices = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v =>
-        v.name.includes("Google UK English Female") ||
-        v.name.includes("Samantha") ||
-        v.name.includes("Google US English") ||
-        v.name.includes("Google") ||
-        v.name.includes("Natural")
-      );
+      const preferred =
+        voices.find(v => v.name === "Google UK English Female") ||
+        voices.find(v => v.name === "Google US English") ||
+        voices.find(v => v.name === "Samantha") ||
+        voices.find(v => v.name === "Karen") ||
+        voices.find(v => v.name === "Moira") ||
+        voices.find(v => v.lang === "en-GB" && v.localService === false) ||
+        voices.find(v => v.lang === "en-US" && v.localService === false) ||
+        voices.find(v => v.lang.startsWith("en"));
       if (preferred) voiceRef.current = preferred;
     };
     loadVoice();
@@ -72,14 +74,17 @@ export default function VoiceWidget() {
 
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    if (voiceRef.current) utterance.voice = voiceRef.current;
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-    utterance.onstart = () => setSpeaking(true);
-    utterance.onend = () => setSpeaking(false);
-    window.speechSynthesis.speak(utterance);
+    const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+    sentences.forEach((sentence, index) => {
+      const utterance = new SpeechSynthesisUtterance(sentence.trim());
+      if (voiceRef.current) utterance.voice = voiceRef.current;
+      utterance.rate = 0.88;
+      utterance.pitch = 1.0;
+      utterance.volume = 1;
+      if (index === 0) utterance.onstart = () => setSpeaking(true);
+      if (index === sentences.length - 1) utterance.onend = () => setSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    });
   };
 
   const sendMessage = async (text: string) => {
