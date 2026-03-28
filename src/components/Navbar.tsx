@@ -6,9 +6,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -24,48 +24,56 @@ export default function Navbar() {
   ];
 
   return (
-    <>
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0 3rem", height: "80px",
-        background: scrolled ? "rgba(10,7,5,0.97)" : "linear-gradient(to bottom, rgba(10,7,5,0.8), transparent)",
-        borderBottom: scrolled ? "1px solid rgba(201,169,110,0.1)" : "none",
-        transition: "all 0.4s ease",
-      }}>
-        <span style={{ fontFamily: "var(--font-playfair)", fontSize: "1.5rem", color: "#e8c98a" }}>
-          Ember &amp; Salt
-        </span>
+    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: scrolled ? "0.8rem 1.5rem" : "1.2rem 1.5rem", background: scrolled ? "rgba(10,7,5,0.95)" : "transparent", backdropFilter: scrolled ? "blur(12px)" : "none", borderBottom: scrolled ? "1px solid rgba(201,169,110,0.1)" : "none", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
-        {/* Desktop links */}
-        <ul style={{ display: "flex", gap: "2.5rem", listStyle: "none", margin: 0, padding: 0 }}
-          className="hidden-mobile">
-          {links.map((l) => (
-            <li key={l.href}>
-              <button onClick={() => scrollTo(l.href)} style={{
-                background: "none", border: "none", cursor: "pointer",
-                color: "#7a6e62", fontSize: "0.75rem", letterSpacing: "0.2em",
-                textTransform: "uppercase", fontWeight: 500,
-              }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#c9a96e")}
-                onMouseLeave={e => (e.currentTarget.style.color = "#7a6e62")}>
-                {l.label}
-              </button>
-            </li>
+      {/* Logo */}
+      <div onClick={() => scrollTo("#")} style={{ fontFamily: "var(--font-playfair)", fontSize: "1.2rem", color: "#e8c98a", cursor: "pointer" }}>
+        Ember &amp; Salt
+      </div>
+
+      {/* Desktop links */}
+      <div className="nav-links" style={{ display: "flex", gap: "2.5rem" }}>
+        {links.map(({ label, href }) => (
+          <button key={label} onClick={() => scrollTo(href)} style={{ background: "none", border: "none", color: "#7a6e62", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", cursor: "pointer", transition: "color 0.2s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#c9a96e")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#7a6e62")}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Book button */}
+      <button className="nav-book" onClick={() => scrollTo("#reserve")} style={{ background: "transparent", color: "#c9a96e", border: "1px solid rgba(201,169,110,0.4)", padding: "0.5rem 1.2rem", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}>
+        Book a Table
+      </button>
+
+      {/* Mobile hamburger */}
+      <button className="nav-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "none", border: "none", color: "#c9a96e", fontSize: "1.5rem", cursor: "pointer", display: "none" }}>
+        {menuOpen ? "✕" : "☰"}
+      </button>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(10,7,5,0.98)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
+          <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", background: "none", border: "none", color: "#c9a96e", fontSize: "1.5rem", cursor: "pointer" }}>✕</button>
+          {links.map(({ label, href }) => (
+            <button key={label} onClick={() => scrollTo(href)} style={{ background: "none", border: "none", color: "#f5ede0", fontSize: "1.5rem", fontFamily: "var(--font-playfair)", cursor: "pointer" }}>
+              {label}
+            </button>
           ))}
-        </ul>
+          <button onClick={() => scrollTo("#reserve")} style={{ background: "#c9a96e", color: "#0a0705", border: "none", padding: "0.8rem 2rem", fontSize: "0.8rem", letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", marginTop: "1rem" }}>
+            Book a Table
+          </button>
+        </div>
+      )}
 
-        <button onClick={() => scrollTo("#reserve")} style={{
-          border: "1px solid #7a6140", background: "transparent", color: "#c9a96e",
-          fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase",
-          padding: "0.6rem 1.5rem", cursor: "pointer", transition: "all 0.3s",
-        }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#c9a96e"; e.currentTarget.style.color = "#0a0705"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#c9a96e"; }}>
-          Book a Table
-        </button>
-      </nav>
-      <style>{`.hidden-mobile { display: flex; } @media(max-width:768px){ .hidden-mobile { display: none; } }`}</style>
-    </>
+      <style>{`
+        @media (max-width: 768px) {
+          .nav-links { display: none !important; }
+          .nav-book { display: none !important; }
+          .nav-hamburger { display: block !important; }
+        }
+      `}</style>
+    </nav>
   );
 }

@@ -18,13 +18,13 @@ export default function Reservation() {
   const label = { fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase" as const, color: "#7a6140", display: "block", marginBottom: "0.4rem" };
 
   return (
-    <section id="reserve" style={{ padding: "6rem 4rem" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
+    <section id="reserve" style={{ padding: "4rem 1.5rem" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr", gap: "3rem" }} className="reserve-grid">
 
         {/* Left text */}
         <div>
           <p style={{ color: "#c9a96e", fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", marginBottom: "0.8rem" }}>Reserve Your Evening</p>
-          <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(2rem,3.5vw,3rem)", fontWeight: 400, color: "#f5ede0", lineHeight: 1.2, marginBottom: "1.2rem" }}>
+          <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(1.8rem,5vw,3rem)", fontWeight: 400, color: "#f5ede0", lineHeight: 1.2, marginBottom: "1.2rem" }}>
             An evening<br />worth remembering.
           </h2>
           <p style={{ color: "#7a6e62", lineHeight: 1.8, fontSize: "0.95rem" }}>
@@ -39,8 +39,8 @@ export default function Reservation() {
           </div>
         </div>
 
-        {/* Glassmorphism form */}
-        <div style={{ border: "1px solid rgba(201,169,110,0.18)", background: "rgba(201,169,110,0.04)", backdropFilter: "blur(12px)", padding: "2.5rem" }}>
+        {/* Form */}
+        <div style={{ border: "1px solid rgba(201,169,110,0.18)", background: "rgba(201,169,110,0.04)", backdropFilter: "blur(12px)", padding: "2rem" }}>
           {status === "success" ? (
             <div style={{ textAlign: "center", padding: "3rem 0" }}>
               <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>✅</div>
@@ -76,6 +76,15 @@ export default function Reservation() {
           )}
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 768px) {
+          .reserve-grid {
+            grid-template-columns: 1fr 1fr !important;
+            padding: 6rem 4rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
