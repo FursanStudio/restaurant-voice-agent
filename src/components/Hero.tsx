@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense, lazy } from "react";
+const HeroRing3D = lazy(() => import("./HeroRing3D"));
 
 export default function Hero() {
   const bgRef = useRef<HTMLDivElement>(null);
@@ -21,8 +22,9 @@ export default function Hero() {
     <section style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "2rem", overflow: "hidden" }}>
 
       {/* Parallax glow */}
-      <div ref={bgRef} style={{ position: "absolute", inset: 0, zIndex: 0, willChange: "transform", background: "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,169,110,0.13) 0%, transparent 70%)" }} />
-
+      <Suspense fallback={null}>
+  <HeroRing3D />
+</Suspense>
       {/* Rings */}
       {[500, 700, 950].map((size, i) => (
         <div key={size} style={{

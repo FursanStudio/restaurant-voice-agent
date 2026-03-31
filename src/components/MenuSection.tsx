@@ -1,4 +1,6 @@
 "use client";
+import { Suspense, lazy } from "react";
+const MenuCard3D = lazy(() => import("./MenuCard3D"));
 
 const items = [
   { id: 1, emoji: "🦪", tag: "Starter", name: "Oyster & Ember Foam", desc: "Kumamoto oyster, smoked cream, charred leek oil, golden caviar.", price: 34 },
@@ -18,7 +20,11 @@ export default function MenuSection() {
           The <em style={{ fontStyle: "italic", color: "#e8c98a" }}>Tasting Menu</em>
         </h2>
       </div>
-
+<div style={{ marginBottom: "2rem" }}>
+  <Suspense fallback={null}>
+    <MenuCard3D />
+  </Suspense>
+</div>
       <div className="menu-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1px", maxWidth: "1200px", margin: "0 auto", background: "rgba(201,169,110,0.1)" }}>
         {items.map((item) => (
           <div key={item.id} style={{ background: "#110d0a", padding: "2rem 1.5rem", position: "relative", transition: "transform 0.3s" }}

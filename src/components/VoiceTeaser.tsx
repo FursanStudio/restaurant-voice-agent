@@ -1,5 +1,6 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, lazy } from "react";
+const ParticleOrb3D = lazy(() => import("./ParticleOrb3D"));
 
 export default function VoiceTeaser() {
   const features = [
@@ -10,12 +11,10 @@ export default function VoiceTeaser() {
   ];
 
   const openWidget = () => {
-    // Find the toggle button in VoiceWidget and click it
     const buttons = document.querySelectorAll("button");
     buttons.forEach((btn) => {
       if (btn.title === "Chat with AI Host") {
         btn.click();
-        // Scroll to bottom right so widget is visible
         window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
       }
     });
@@ -33,46 +32,20 @@ export default function VoiceTeaser() {
         Ask about our menu, make reservations, or get recommendations — all with your voice or by typing.
       </p>
 
-      {/* Clickable Orb */}
-      <div
-        onClick={openWidget}
-        style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "4rem 0 1rem", cursor: "pointer" }}
-      >
-        {[160, 210, 265].map((size, i) => (
-          <div key={size} style={{
-            position: "absolute", borderRadius: "50%",
-            border: "1px solid rgba(201,169,110,0.2)",
-            width: size, height: size,
-            animation: `ripple 3s ease-out ${i * 0.8}s infinite`,
-            pointerEvents: "none",
-          }} />
-        ))}
-        <div style={{
-          position: "relative", zIndex: 1, width: 120, height: 120, borderRadius: "50%",
-          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem",
-          border: "1px solid rgba(201,169,110,0.3)",
-          background: "radial-gradient(circle at 40% 35%, rgba(201,169,110,0.25), transparent 70%)",
-          transition: "all 0.3s",
-          boxShadow: "0 0 30px rgba(201,169,110,0.15)",
-        }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 50px rgba(201,169,110,0.4)";
-            (e.currentTarget as HTMLDivElement).style.transform = "scale(1.05)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 30px rgba(201,169,110,0.15)";
-            (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
-          }}
-        >
-          🎤
-        </div>
+      {/* 3D Particle Orb */}
+      <div onClick={openWidget} style={{ cursor: "pointer", margin: "2rem auto 1rem", maxWidth: 400 }}>
+        <Suspense fallback={
+          <div style={{ width: 200, height: 200, borderRadius: "50%", background: "rgba(201,169,110,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem", margin: "0 auto" }}>🎤</div>
+        }>
+          <ParticleOrb3D />
+        </Suspense>
       </div>
 
       {/* Live badge */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", marginBottom: "4rem" }}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }} />
         <p style={{ color: "#4ade80", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", margin: 0 }}>
-          Live — Click the mic to chat!
+          Live — Click the orb to chat!
         </p>
       </div>
 
@@ -86,13 +59,6 @@ export default function VoiceTeaser() {
           </div>
         ))}
       </div>
-
-      <style>{`
-        @keyframes ripple {
-          0%   { opacity: 0.5; transform: scale(0.85); }
-          100% { opacity: 0;   transform: scale(1.15); }
-        }
-      `}</style>
     </section>
   );
 }
